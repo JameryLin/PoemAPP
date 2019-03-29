@@ -110,11 +110,12 @@ public class StudyPageFragment extends Fragment {
 
     //瀑布流布局适配器去
     public void PubuliuAdapter(){
-        RecyclerView recyclerView = getActivity().findViewById(R.id.study_recycler_view);
+        RecyclerView recyclerView = view1.findViewById(R.id.study_recycler_view);
         StaggeredGridLayoutManager layoutManager = new
                 StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         StudyCardWriterAdapter adapter = new StudyCardWriterAdapter(writerDBList);
+        recyclerView.setAdapter(adapter);
     }
 
     //临时数据初始化
@@ -123,7 +124,7 @@ public class StudyPageFragment extends Fragment {
         for (int i=0;i<10;i++){
             writerDB[i] = new WriterDB();
             writerDB[i].setWriterName("苏轼");
-            writerDB[i].setWriterIconImageID(R.mipmap.writer_sushi);
+            writerDB[i].setWriterIconImageID(R.drawable.writer_sushi);
             writerDB[i].setWriterStory("大名鼎鼎的东坡肉便是他的杰作");
             writerDB[i].save();
         }
