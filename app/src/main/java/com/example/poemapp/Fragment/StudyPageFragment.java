@@ -13,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.poemapp.Database.WriterDB;
+import com.example.poemapp.Database.PoemDB;
 import com.example.poemapp.JavaClass.StudyCardWriterAdapter;
 import com.example.poemapp.JavaClass.ViewPagerAdapter;
 import com.example.poemapp.R;
@@ -29,7 +29,7 @@ import java.util.List;
 
 public class StudyPageFragment extends Fragment {
     //全局声明
-    private List<WriterDB> writerDBList = new ArrayList<WriterDB>();
+    private List<PoemDB> poemDBList = new ArrayList<PoemDB>();
     View view1,view2;
     ViewPager viewPager;
     List<View> viewList;
@@ -114,21 +114,13 @@ public class StudyPageFragment extends Fragment {
         StaggeredGridLayoutManager layoutManager = new
                 StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-        StudyCardWriterAdapter adapter = new StudyCardWriterAdapter(writerDBList);
+        StudyCardWriterAdapter adapter = new StudyCardWriterAdapter(poemDBList);
         recyclerView.setAdapter(adapter);
     }
 
     //临时数据初始化
     public void InitDateBase(){
-        WriterDB writerDB[] = new WriterDB[10];
-        for (int i=0;i<10;i++){
-            writerDB[i] = new WriterDB();
-            writerDB[i].setWriterName("苏轼");
-            writerDB[i].setWriterIconImageID(R.drawable.writer_sushi);
-            writerDB[i].setWriterStory("大名鼎鼎的东坡肉便是他的杰作");
-            writerDB[i].save();
-        }
-        writerDBList = LitePal.findAll(WriterDB.class);
+        poemDBList = LitePal.findAll(PoemDB.class);
 
     }
 
