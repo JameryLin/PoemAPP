@@ -1,6 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="15dp"
+    android:orientation="vertical"
+    android:background="@drawable/shape_corner"
+    android:elevation="4dp">
 
-</android.support.constraint.ConstraintLayout>
+    <com.gcssloop.widget.RCRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:round_corner_top_left="20dp"
+        app:round_corner_top_right="20dp">
+    
+        <ImageView
+            android:id="@+id/minivideo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            android:background="@drawable/header" />
+
+    </com.gcssloop.widget.RCRelativeLayout>
+
+    <TextView
+        android:id="@+id/minivideo_title"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:paddingLeft="30dp"
+        android:textStyle="bold"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp">
+
+        <Button
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@mipmap/nav_collection" />
+
+        <Button
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="right"
+            android:background="@mipmap/nav_good" />
+
+        <Button
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="right"
+            android:layout_marginRight="40dp"
+            android:background="@mipmap/nav_msg" />
+    </FrameLayout>
+
+</LinearLayout>

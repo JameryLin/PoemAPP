@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -14,6 +15,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 
 import com.example.poemapp.Fragment.CommunicatePageFragment;
@@ -26,12 +30,18 @@ import com.example.poemapp.R;
 
 import java.io.IOException;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 
 public class MainActivity extends BaseActivity {
     //全局声明
     Toolbar toolbar;
     DrawerLayout drawerLayout;
     ActionBar actionBar;
+    NavigationView navigationView;
+    CircleImageView circleImageView;
+    View headLayout;
+    ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +53,8 @@ public class MainActivity extends BaseActivity {
 
         //调用控件
         initView();
-
+        //左滑菜单响应
+        drawerLayoutListener();
     }
 
 
@@ -56,6 +67,8 @@ public class MainActivity extends BaseActivity {
         //获取控件id
         toolbar = findViewById(R.id.study_toolbar);
         drawerLayout = findViewById(R.id.study_drawerlayout);
+        navigationView = findViewById(R.id.zuohua_menu);
+        headLayout = navigationView.inflateHeaderView(R.layout.nav_header);
 
         //顶端标题
         setSupportActionBar(toolbar);
@@ -91,6 +104,17 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        //左滑菜单顶部头像响应
+        imageView = headLayout.findViewById(R.id.icon_image);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,UserActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
 
     }
 
@@ -100,7 +124,6 @@ public class MainActivity extends BaseActivity {
         return true;
     }
 
-
     //点击item
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
@@ -109,13 +132,57 @@ public class MainActivity extends BaseActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.search:
-                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-                startActivity(intent);
+                Intent intent1 = new Intent(MainActivity.this, SearchActivity.class);
+                startActivity(intent1);
                 break;
+            case R.id.index:
+                Intent intent2 = new Intent(MainActivity.this, IndexActivity.class);
+                startActivity(intent2);
             default:
                 break;
         }
         return true;
+    }
+
+    //左滑菜单响应
+    public void drawerLayoutListener(){
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.nav_setting:
+                        Intent intenta = new Intent(MainActivity.this,SettingActivity.class);
+                        startActivity(intenta);
+                        break;
+                    case R.id.nav_friend:
+                        Intent intentb = new Intent(MainActivity.this,FriendActivity.class);
+                        startActivity(intentb);
+                        break;
+                    case R.id.nav_msg:
+                        Intent intentc = new Intent(MainActivity.this,MsgActivity.class);
+                        startActivity(intentc);
+                        break;
+                    case R.id.nav_collection:
+                        Intent intentd = new Intent(MainActivity.this,MyCollectionActivity.class);
+                        startActivity(intentd);
+                        break;
+                    case R.id.nav_langsong:
+                        Intent intente = new Intent(MainActivity.this,MyIntonationActivity.class);
+                        startActivity(intente);
+                        break;
+                    case R.id.nav_write:
+                        Intent intentf = new Intent(MainActivity.this,MyWorksActivity.class);
+                        startActivity(intentf);
+                        break;
+                    default:
+                        break;
+                }
+
+                return true;
+            }
+        });
+
+
     }
 
     //fragment切换

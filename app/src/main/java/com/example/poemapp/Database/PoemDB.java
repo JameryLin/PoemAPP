@@ -7,6 +7,7 @@ import org.litepal.crud.LitePalSupport;
  */
 
 public class PoemDB extends LitePalSupport{
+    private int poemImageID;
     private int poemID;
     private String poemName;
     private String poemZhushi;
@@ -26,6 +27,10 @@ public class PoemDB extends LitePalSupport{
     ///////////////////get/////////////////
     public int getPoemID() {
         return poemID;
+    }
+
+    public int getPoemImageID() {
+        return poemImageID;
     }
 
     public String getPoemName() {
@@ -86,6 +91,11 @@ public class PoemDB extends LitePalSupport{
 
     ////////////////////set//////////////////
 
+
+    public void setPoemID(int poemID) {
+        this.poemID = poemID;
+    }
+
     public void setPoemAppreciation(String poemAppreciation) {
         this.poemAppreciation = poemAppreciation;
     }
@@ -98,8 +108,8 @@ public class PoemDB extends LitePalSupport{
         this.poemFYRadioPath = poemFYRadioPath;
     }
 
-    public void setPoemID(int poemID) {
-        this.poemID = poemID;
+    public void setPoemImageID(int poemImageID) {
+        this.poemImageID = poemImageID;
     }
 
     public void setPoemFromBook(String poemFromBook) {
@@ -145,4 +155,6 @@ public class PoemDB extends LitePalSupport{
     public void setPoemWriterName(String poemWriterName) {
         this.poemWriterName = poemWriterName;
     }
+
+
 }

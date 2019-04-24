@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.poemapp">
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:name="org.litepal.LitePalApplication"
         android:allowBackup="true"
@@ -19,7 +24,20 @@
         </activity>
         <activity android:name=".Activity.BaseActivity" />
         <activity android:name=".Activity.MainActivity" />
-        <activity android:name=".Activity.SearchActivity"/>
+        <activity android:name=".Activity.SearchActivity" />
+        <activity android:name=".Activity.SettingActivity" />
+        <activity
+            android:name=".Activity.UserActivity"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".Activity.IndexActivity" />
+        <activity android:name=".Activity.MsgActivity" />
+        <activity android:name=".Activity.FriendActivity" />
+        <activity android:name=".Activity.MyCollectionActivity" />
+        <activity android:name=".Activity.MyWorksActivity" />
+        <activity android:name=".Activity.MyIntonationActivity" />
+        <activity
+            android:name=".Activity.ReadPoemActivity"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
