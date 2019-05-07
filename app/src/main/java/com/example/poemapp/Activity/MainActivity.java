@@ -11,16 +11,22 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.example.poemapp.Fragment.CommunicatePageFragment;
+import com.example.poemapp.Fragment.CreatePageFinishFragment;
 import com.example.poemapp.Fragment.FunPageFragment;
 import com.example.poemapp.Fragment.StudyPageFragment;
 import com.example.poemapp.Fragment.CreatePageFragment;
@@ -43,11 +49,12 @@ public class MainActivity extends BaseActivity {
     View headLayout;
     ImageView imageView;
     TextView titleText;
-    MenuItem searchMI;
-    MenuItem indexMI;
+    MenuItem searchMI,indexMI,finishMI,shareMI,moomMI;
+    Menu drawerMenu;
 
     //控制量
-    Boolean mVisiable = true;
+    private Boolean mVisiable = true;
+    private int mSwitch = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +117,7 @@ public class MainActivity extends BaseActivity {
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {   //监听器
+                setmSwitch(0);
                 switch (item.getItemId()){
                     case R.id.bt_study:
                         replaceFragment(new StudyPageFragment());
@@ -117,7 +125,7 @@ public class MainActivity extends BaseActivity {
                         mVisiable = true;
                         invalidateOptionsMenu();
                         break;
-                    case R.id.bt_write:
+                    case R.id.bt_create:
                         replaceFragment(new CreatePageFragment());
                         titleText.setText("作诗");
                         mVisiable = false;
@@ -148,6 +156,12 @@ public class MainActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.toolbar,menu);
         searchMI = menu.findItem(R.id.search);
         indexMI = menu.findItem(R.id.index);
+        finishMI = menu.findItem(R.id.finish);
+        shareMI = menu.findItem(R.id.share);
+
+        //动态设置可见
+        finishMI.setVisible(false);
+        shareMI.setVisible(false);
 
         if (mVisiable){
             searchMI.setVisible(true);
@@ -156,6 +170,13 @@ public class MainActivity extends BaseActivity {
             searchMI.setVisible(false);
             indexMI.setVisible(false);
         }
+
+        if (mSwitch == 2){
+            finishMI.setVisible(true);
+        }else if (mSwitch == 3){
+            shareMI.setVisible(true);
+        }
+
         return true;
     }
 
@@ -173,6 +194,12 @@ public class MainActivity extends BaseActivity {
             case R.id.index:
                 Intent intent2 = new Intent(MainActivity.this, IndexActivity.class);
                 startActivity(intent2);
+            case R.id.finish:
+                setmSwitch(3);
+                replaceFragment(new CreatePageFinishFragment());
+                break;
+            case R.id.share:
+                break;
             default:
                 break;
         }
@@ -181,6 +208,22 @@ public class MainActivity extends BaseActivity {
 
     //左滑菜单响应
     public void drawerLayoutListener(){
+        //夜间开关
+        drawerMenu = navigationView.getMenu();
+        moomMI = drawerMenu.findItem(R.id.nav_moon);
+        Switch moomSwitch = (Switch) moomMI.getActionView();
+        moomSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    Log.d(String.valueOf(MainActivity.this),"夜间模式开启");
+                }else {
+                    Log.d(String.valueOf(MainActivity.this),"夜间模式关闭");
+                }
+            }
+        });
+
+        //左滑菜单按钮监听
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -228,6 +271,11 @@ public class MainActivity extends BaseActivity {
         transaction.commit();   //提交并结束事务
     }
 
+    //mSwitch控制量设置，影响标题栏按钮动态显示
+    public void setmSwitch(int index){
+        mSwitch = index;
+        invalidateOptionsMenu();
+    }
 
 
 }
