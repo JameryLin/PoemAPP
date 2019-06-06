@@ -9,17 +9,17 @@ import org.litepal.crud.LitePalSupport;
 public class PoemDB extends LitePalSupport{
     private int poemImageID;
     private int poemID;
-    private String poemName;
-    private String poemZhushi;
-    private String poemTranslation;
-    private String poemAppreciation;
+    private String poemName;            //诗名
+    private String poemZhushi;          //注释
+    private String poemTranslation;     //译文
+    private String poemAppreciation;    //赏析
     private String poemSpot;
     private String poemPTRadioPath; //普通话音频路径
     private String poemFYRadioPath; //方言音频路径
     private String poemKeyWord;
     private String poemFromBook;
     private String poemTab;
-    private String poemCotent;
+    private String poemContent;         //诗文内容
     private String poemWriterName;  //诗词作者（主码）
     private String poemCreateBackgrond; //诗词创作背景（联系集）
     private String poemCreateTime;  //诗词创作时期（联系集）
@@ -69,8 +69,8 @@ public class PoemDB extends LitePalSupport{
         return poemTranslation;
     }
 
-    public String getPoemCotent() {
-        return poemCotent;
+    public String getPoemContent() {
+        return poemContent;
     }
 
     public String getPoemCreateBackgrond() {
@@ -140,8 +140,8 @@ public class PoemDB extends LitePalSupport{
         this.poemTranslation = poemTranslation;
     }
 
-    public void setPoemCotent(String poemCotent) {
-        this.poemCotent = poemCotent;
+    public void setPoemContent(String poemContent) {
+        this.poemContent = poemContent;
     }
 
     public void setPoemCreateBackgrond(String poemCreateBackgrond) {

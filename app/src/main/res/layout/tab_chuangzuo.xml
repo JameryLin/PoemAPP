@@ -37,6 +37,7 @@
         android:layout_alignLeft="@+id/imageView2"
         android:layout_alignStart="@+id/imageView2"
         android:layout_below="@+id/imageView2"
+        android:inputType="textPhonetic"
         android:background="@drawable/edittext_bg"/>
 
     <ImageView
@@ -66,6 +67,7 @@
         android:layout_alignLeft="@+id/imageView3"
         android:layout_alignStart="@+id/imageView3"
         android:layout_below="@+id/imageView3"
+        android:inputType="textPhonetic"
         android:background="@drawable/edittext_bg"/>
 
     <ImageButton
@@ -100,4 +102,5 @@
         android:text="提示词"
         android:background="@mipmap/icon_image"
         android:visibility="gone"/>
+
 </RelativeLayout>

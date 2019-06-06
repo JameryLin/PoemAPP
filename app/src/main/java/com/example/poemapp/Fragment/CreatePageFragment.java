@@ -1,13 +1,24 @@
 package com.example.poemapp.Fragment;
 
 import android.content.Context;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
+import com.google.android.material.tabs.TabLayout;
+import androidx.fragment.app.Fragment;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.ViewPager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
+import android.renderscript.Sampler;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,12 +35,14 @@ import com.example.poemapp.JavaClass.CreateCardRWAdapter;
 import com.example.poemapp.JavaClass.CreateCardTJAdapter;
 import com.example.poemapp.JavaClass.ViewPagerAdapter;
 import com.example.poemapp.R;
+import com.example.poemapp.ViewModel.CreatePageViewModel;
 
 import org.litepal.LitePal;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 
 /**
  * Created by dell on 2019/3/19.
@@ -52,18 +65,19 @@ public class CreatePageFragment extends Fragment {
     LayoutInflater inflater;
     TabLayout tabLayout,tabLayout1;
     Context mcontext;
-    TextView tipText;
+    TextView tipText,yangshiText;
     EditText topicText,contentText;
     ImageButton tipButton;
-    String topic;
-    String content;
+    Editable topic,content;
     RecyclerView paibanRecyclerView,fontRecyclerView,
             tuijianRecyclerView,fengjingRecyclerView,renwuRecyclerView;
-    
+
+    //UI数据管理对象
+    CreatePageViewModel createPageViewModel;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.fragment_create,container,false);
-
         return view;
     }
 
@@ -73,10 +87,20 @@ public class CreatePageFragment extends Fragment {
         mainActivity = (MainActivity) getActivity();//获得活动的实例
         mcontext = mainActivity;
 
-        InitDateBase();
+        InitDateBase();//初始化数据
         InitView();//初始化控件
         ViewPagerAdapter();//滑块+界面适配器
-        RecyclerViewAdapter();
+        RecyclerViewAdapter();//循环视图适配器
+
+
+        //初始化UI数据管理对象及设置观察者
+        createPageViewModel = ViewModelProviders.of((FragmentActivity) mcontext).get(CreatePageViewModel.class);
+        createPageViewModel.getEditText().observe((LifecycleOwner) mcontext, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                yangshiText.setText(s);
+            }
+        });
     }
 
 
@@ -112,10 +136,13 @@ public class CreatePageFragment extends Fragment {
         //------------------创作
         tipButton = view1.findViewById(R.id.write_tip_button);
         tipText = view1.findViewById(R.id.write_tips_text);
-        contentText = view1.findViewById(R.id.topic_editText);
-        topicText = view1.findViewById(R.id.content_editText);
-        content = contentText.getText().toString();
-        topic = topicText.getText().toString();
+        topicText = view1.findViewById(R.id.topic_editText);
+        contentText = view1.findViewById(R.id.content_editText);
+
+        topic = topicText.getText();
+
+        //------------------样式
+        yangshiText = view2.findViewById(R.id.yangshi_text);
 
         //------------------配图
         tabLayout1 = view3.findViewById(R.id.peitu_tablayout);
@@ -125,6 +152,7 @@ public class CreatePageFragment extends Fragment {
         renwuView = inflater.inflate(R.layout.tab_create_peitu_rw,null);
 
         giveTips();
+        submitText();
         setPeituTab();
     }
 
@@ -147,18 +175,53 @@ public class CreatePageFragment extends Fragment {
 
     }
 
+    //提交创作的文字
+    private void submitText() {
+
+        contentText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                Log.i("CreatePageFragment","之前");
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                Log.i("CreatePageFragment","之后");
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                content = contentText.getText();
+                createPageViewModel.addEditText(content.toString());
+            }
+        });
+    }
+
+
     //给灵感相关
     private void giveTips() {
         tipButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Random random = new Random();
-                int randNum = random.nextInt(N);
-                str = createDBList.get(randNum).getCreateTips();
-                str1 = createDBList.get(randNum).getCreateTips();
-                str2 = createDBList.get(randNum).getCreateTips();
-                str3 = createDBList.get(randNum).getCreateTips();
-                tipText.setText(str + str1 + str2 + str3);
+                Vector<Integer> randInt = new Vector<Integer>();
+                int count = 0;
+                while(count <4){
+                    int randNum = random.nextInt(N)+1;
+                    if(!randInt.contains(randNum)){
+                        randInt.add(randNum);
+                        count++;
+                    }
+
+                }
+
+                str = createDBList.get(randInt.get(0)).getCreateTips();
+                str1 = createDBList.get(randInt.get(1)).getCreateTips();
+                str2 = createDBList.get(randInt.get(2)).getCreateTips();
+                str3 = createDBList.get(randInt.get(3)).getCreateTips();
+
+                tipText.setText(str + " "+str1+" "+ str2+" " + str3);
+
                 tipText.setVisibility(View.VISIBLE);
             }
         });
@@ -242,6 +305,8 @@ public class CreatePageFragment extends Fragment {
 
         //推荐
         tuijianRecyclerView = tuijianView.findViewById(R.id.tj_recyclerview);
+        tuijianRecyclerView.setHasFixedSize(true);
+        tuijianRecyclerView.setNestedScrollingEnabled(false);
         StaggeredGridLayoutManager layoutManager2 = new
                 StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.HORIZONTAL);
         tuijianRecyclerView.setLayoutManager(layoutManager2);
@@ -250,6 +315,8 @@ public class CreatePageFragment extends Fragment {
 
         //风景
         fengjingRecyclerView = fengjingView.findViewById(R.id.fj_recyclerview);
+        fengjingRecyclerView.setHasFixedSize(true);
+        fengjingRecyclerView.setNestedScrollingEnabled(false);
         StaggeredGridLayoutManager layoutManager3 = new
                 StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.HORIZONTAL);
         fengjingRecyclerView.setLayoutManager(layoutManager3);
@@ -258,6 +325,8 @@ public class CreatePageFragment extends Fragment {
 
         //人物
         renwuRecyclerView = renwuView.findViewById(R.id.rw_recyclerview);
+        renwuRecyclerView.setHasFixedSize(true);
+        renwuRecyclerView.setNestedScrollingEnabled(false);
         StaggeredGridLayoutManager layoutManager4 = new
                 StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.HORIZONTAL);
         renwuRecyclerView.setLayoutManager(layoutManager4);
@@ -275,5 +344,7 @@ public class CreatePageFragment extends Fragment {
     public void reDrawToolbar() {
         mainActivity.setmSwitch(index);
     }
+
+    //监控数据
 
 }
