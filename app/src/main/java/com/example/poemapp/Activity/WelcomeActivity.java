@@ -9,8 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.poemapp.InitData.InitCommuicateFunDB;
 import com.example.poemapp.InitData.InitCreateDB;
 import com.example.poemapp.InitData.InitPoemDB;
+import com.example.poemapp.InitData.InitPostDB;
 import com.example.poemapp.InitData.InitWriterDB;
 import com.example.poemapp.R;
 
@@ -46,6 +48,8 @@ public class WelcomeActivity extends BaseActivity {
                 InitPoemDB initPoemDB = new InitPoemDB(this);
                 InitWriterDB initWriterDB = new InitWriterDB(this);
                 InitCreateDB initCreateDB = new InitCreateDB(this);
+                InitPostDB initPostDB = new InitPostDB(this);
+                InitCommuicateFunDB initCommuicateFunDB = new InitCommuicateFunDB(this);
             } catch (IOException e) {
                 e.printStackTrace();
             }
