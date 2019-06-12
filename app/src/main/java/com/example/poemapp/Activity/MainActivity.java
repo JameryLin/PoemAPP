@@ -3,11 +3,14 @@ package com.example.poemapp.Activity;
 import android.content.Intent;
 import androidx.annotation.NonNull;
 
-import com.example.poemapp.databinding.TabPeituBinding;
+import com.example.poemapp.InitData.InitCommuicateFunDB;
+import com.example.poemapp.InitData.InitCreateDB;
+import com.example.poemapp.InitData.InitNameDB;
+import com.example.poemapp.InitData.InitPostDB;
+import com.example.poemapp.InitData.InitUserMakeDB;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -15,13 +18,19 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Rect;
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SwitchCompat;
+
+import android.os.Environment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,6 +39,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -44,7 +54,11 @@ import com.example.poemapp.JavaClass.BottomNavigationViewHelper;
 import com.example.poemapp.R;
 
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.temporal.TemporalAccessor;
+import java.util.Calendar;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -63,6 +77,9 @@ public class MainActivity extends BaseActivity {
     Menu drawerMenu;
     LayoutInflater layoutInflater;
     View view;
+    boolean isFirstRun;
+    SharedPreferences.Editor editor;
+    CreatePageFragment createPageFragment = new CreatePageFragment();
 
     //控制量
     private Boolean mVisiable = true;
@@ -72,6 +89,10 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         changeitem();
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences=this.getSharedPreferences("share",MODE_PRIVATE);
+        isFirstRun=sharedPreferences.getBoolean("isFirstRun", true);
+        editor=sharedPreferences.edit();
+
 
         setContentView(R.layout.activity_main);
         replaceFragment(new StudyPageFragment());
@@ -91,6 +112,8 @@ public class MainActivity extends BaseActivity {
     public void initView(){
         //获取控件id
         layoutInflater = getLayoutInflater();
+        finishText = (TextView) layoutInflater.inflate
+                (R.layout.tab_peitu,null).findViewById(R.id.peitu_text);
         view = layoutInflater.inflate(R.layout.tab_peitu,null);
         finishText = view.findViewById(R.id.peitu_text);
         toolbar = findViewById(R.id.study_toolbar);
@@ -141,20 +164,53 @@ public class MainActivity extends BaseActivity {
                         invalidateOptionsMenu();
                         break;
                     case R.id.bt_create:
-                        replaceFragment(new CreatePageFragment());
-                        titleText.setText("作诗");
+                        //判断是否第一次运行
+                        if(isFirstRun){
+                            editor.putBoolean("isFirstRun", false);
+                            editor.commit();
+
+                            try {
+                                InitCreateDB initCreateDB = new InitCreateDB(MainActivity.this);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                        replaceFragment(createPageFragment);
+                        titleText.setText("诗作");
                         mVisiable = false;
                         invalidateOptionsMenu();
                         break;
                     case R.id.bt_shequ:
+                        //判断是否第一次运行
+                        if(isFirstRun){
+                            editor.putBoolean("isFirstRun", false);
+                            editor.putBoolean("isComuunicatePageVisited",true);
+                            editor.commit();
+
+                            InitCommuicateFunDB initCommuicateFunDB = new InitCommuicateFunDB(MainActivity.this);
+
+                        }
                         replaceFragment(new CommunicatePageFragment());
-                        titleText.setText("交流");
+                        titleText.setText("诗社");
                         mVisiable = false;
                         invalidateOptionsMenu();
                         break;
                     case R.id.bt_fun:
+                        if(isFirstRun){
+                            editor.putBoolean("isFirstRun", false);
+                            editor.commit();
+
+                            try {
+                                InitNameDB initNameDB = new InitNameDB(MainActivity.this);
+                                InitUserMakeDB initUserMakeDB = new InitUserMakeDB(MainActivity.this);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
                         replaceFragment(new FunPageFragment());
-                        titleText.setText("趣味");
+                        titleText.setText("诗趣");
                         mVisiable = false;
                         invalidateOptionsMenu();
                         break;
@@ -209,10 +265,11 @@ public class MainActivity extends BaseActivity {
             case R.id.index:
                 Intent intent2 = new Intent(MainActivity.this, IndexActivity.class);
                 startActivity(intent2);
+                break;
             case R.id.finish:
+                viewSaveToImage(createPageFragment.saveView());
                 setmSwitch(3);
                 replaceFragment(new CreatePageFinishFragment());
-                viewConversionBitmap(finishText);
                 break;
             case R.id.share:
                 break;
@@ -322,28 +379,58 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    //将View转化为BMP图片
-    public Bitmap viewConversionBitmap(View v) {
+    public void viewSaveToImage(View view) {
+        view.setDrawingCacheEnabled(true);
+        view.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        view.setDrawingCacheBackgroundColor(Color.WHITE);
+
+        // 把一个View转换成图片
+        Bitmap cachebmp = loadBitmapFromView(view);
+
+        FileOutputStream fos;
+        String imagePath = "";
+        try {
+            // 判断手机设备是否有SD卡
+            boolean isHasSDCard = Environment.getExternalStorageState().equals(
+                    android.os.Environment.MEDIA_MOUNTED);
+            if (isHasSDCard) {
+                // SD卡根目录
+                String sdCardDir = Environment.getExternalStorageDirectory() + "/DCIM/";
+                File file = new File(sdCardDir, Calendar.getInstance().getTimeInMillis()+".png");
+                fos = new FileOutputStream(file);
+                imagePath = file.getAbsolutePath();
+            } else
+                throw new Exception("创建文件失败!");
+
+            cachebmp.compress(Bitmap.CompressFormat.PNG, 90, fos);
+
+            fos.flush();
+            fos.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Log.d("imagePath=",imagePath);
+
+        view.destroyDrawingCache();
+    }
+
+    private Bitmap loadBitmapFromView(View v) {
         int w = v.getWidth();
         int h = v.getHeight();
 
-        if (w!=0 && h!=0){
+        Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bmp);
 
-            Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-            Canvas c = new Canvas(bmp);
-            c.drawColor(Color.WHITE);
+        c.drawColor(Color.WHITE);
+        /** 如果不设置canvas画布为白色，则生成透明 */
 
-            /** 如果不设置canvas画布为白色，则生成透明 */
+        v.layout(0, 0, w, h);
+        v.draw(c);
 
-            v.layout(0, 0, w, h);
-            v.draw(c);
-
-            return bmp;
-        }else {
-            return null;
-        }
-
+        return bmp;
     }
+
 
 
 }
