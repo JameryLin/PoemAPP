@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.poemapp.Database.PoemDB;
 
+import com.example.poemapp.Database.WriterDB;
 import com.example.poemapp.R;
 import com.gcssloop.widget.RCRelativeLayout;
 
@@ -30,7 +32,9 @@ public class ReadPoemActivity extends BaseActivity {
 
     //数据库数据获取
     private List<PoemDB> poemList = new ArrayList<PoemDB>();
-    PoemDB poemInformation;
+    private List<WriterDB> writerList = new ArrayList<WriterDB>();
+    PoemDB poemInformation = new PoemDB();
+    WriterDB writerInformation = new WriterDB();
 
     //功能性控件声明
     Button closeButton;
@@ -83,25 +87,27 @@ public class ReadPoemActivity extends BaseActivity {
      */
     //设置标题栏
     private void setTitleBar() {
+        //顶端标题
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
-        if (actionBar != null) {
+        actionBar.setDisplayShowTitleEnabled(false);
+        if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.mipmap.nav_back);
         }
-        actionBar.setTitle("诗词详情");
+
     }
 
     //初始化控件
     private void initView() {
         //获取控件id
-        toolbar = findViewById(R.id.readpoem_toolbar);
+        toolbar = findViewById(R.id.study_toolbar);
         closeButton = findViewById(R.id.readpoem_setbgclose);
         frameLayout = findViewById(R.id.readpoem_setbg);
         frameMainLayout = findViewById(R.id.readpoem_layout);
         poemTextview = findViewById(R.id.readpoem_content);
         detailTextview=findViewById(R.id.readpoem_detail);
-        poemnameTextview=findViewById(R.id.poem_name);
+        poemnameTextview=findViewById(R.id.title_read);
         isDetail=false;
 
         //将读取的数据中的空格替换为换行符，赋予文本框
@@ -110,6 +116,7 @@ public class ReadPoemActivity extends BaseActivity {
         newText = oldText.replace(' ','\n');
         poemnameTextview.setText(poemName);
         poemTextview.setText(newText);
+        poemnameTextview.setGravity(Gravity.CENTER);
 
         //底部按钮
         bjButton=findViewById(R.id.bt_bj);
@@ -133,10 +140,6 @@ public class ReadPoemActivity extends BaseActivity {
         //方法实现
         poemTextview.setMovementMethod(ScrollingMovementMethod.getInstance());//文本可滑动显示
         detailTextview.setMovementMethod(ScrollingMovementMethod.getInstance());
-        //textView.setHorizontallyScrolling(true);
-        //textView.setFocusable(true);
-        //底端按钮适配
-        // J buttomNavigationView();
 
     }
 
@@ -144,49 +147,11 @@ public class ReadPoemActivity extends BaseActivity {
     private void InitDatabase(){
         poemList=LitePal.findAll(PoemDB.class);
         poemInformation=poemList.get(id);
+
+//        writerList = LitePal.findAll(WriterDB.class);
+//        writerInformation = writerList.get(id);
     }
 
-    /**
-     //底端按钮
-     private void buttomNavigationView() {
-     BottomNavigationView navigation = findViewById(R.id.readpoem_bottomtoolbar);
-     BottomNavigationViewHelper.disableShiftMode(navigation);
-     //navigation.setSelectedItemId(navigation.getMenu().getItem(1).getItemId());
-     navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-    //赋值
-    //界面调整
-    layoutParams.width = (width*1);
-    layoutParams.height = (int)(height*0.5);
-    layoutParams.setMargins(30,20,30,20);
-    textView.setLayoutParams(layoutParams);
-    frameLayout.setVisibility(View.VISIBLE);
-    switch (item.getItemId()){
-    case R.id.bt_bj:
-    replaceFragment(new PoemReadBJFragment());
-    break;
-    case R.id.bt_zs:
-    replaceFragment(new PoemReadZSFragment());
-    break;
-    case R.id.bt_yw:
-    replaceFragment(new PoemReadYWFragment());
-    break;
-    case R.id.bt_sx:
-    replaceFragment(new PoemReadSXFragment());
-    break;
-    case R.id.bt_ts:
-    replaceFragment(new PoemReadTSFragment());
-    break;
-    default:
-    break;
-    }
-    return true;
-    }
-    });
-
-     }
-     **/
     //按钮监听
     private void buttomBtOnClick() {
         closeButton.setOnClickListener(new View.OnClickListener() {
