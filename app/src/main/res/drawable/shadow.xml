@@ -26,8 +26,8 @@
         <shape android:shape="rectangle">
             <gradient
                 android:angle="270"
-                android:endColor="#d9bea2"
-                android:startColor="#d9bea2"/>
+                android:endColor="@color/readbg"
+                android:startColor="@color/readbg"/>
 
             <corners
                 android:topLeftRadius="20dp"
